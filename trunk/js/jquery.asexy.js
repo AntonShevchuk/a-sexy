@@ -40,8 +40,13 @@
          * Construct
          */
         this.each(function(){
+            // fix for stupid browser
+            if($.browser.msie){
+                $(this).attr('src', $(this).attr('src') + '?random=' + (new Date()).getTime());
+            }
             // need wait for load images
             $(this).load(function(){
+               
                 var $img = $(this);
                 var $div = $img.wrap('<div class="asexy"></div>').parent();
        
@@ -62,6 +67,29 @@
                     $img.height(imgHeight);
                 }
                 
+                /* Build style for DIV */
+                /* - reset */ 
+                var style = {
+                    width:_sexy.options.width,
+                    height:_sexy.options.height,
+                    position:'relative',
+                    overflow:'hidden'
+                };
+                
+                /* - copy style */
+                /* @see http://stackoverflow.com/questions/1004475/jquery-css-plugin-that-returns-computed-style-of-element-to-pseudo-clone-that-ele */
+                var attr = [ 'margin-top',  'margin-right',  'margin-bottom',  'margin-left',
+                             'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+                             'border-top-width','border-right-width','border-bottom-width',
+                             'border-left-width','border-top-color','border-right-color',
+                             'border-bottom-color','border-left-color','border-top-style',
+                             'border-right-style','border-bottom-style','border-left-style',
+                             'z-index','float','clear','cursor'];
+        
+                var len = attr.length;
+                for (var i = 0; i < len; i++) 
+                    style[attr[i]] = $img.css(attr[i]);
+
                 /* Start position */
                 var left = _sexy.options.left;
                 var top  = _sexy.options.top;
@@ -74,30 +102,6 @@
                     top = -((imgHeight/2)-(_sexy.options.height/2));
                 }
                 
-                /* Build style for DIV */
-                /* - reset */ 
-                var style = {
-                    width:_sexy.options.width,
-                    height:_sexy.options.height,
-                    position:'relative',
-                    overflow:'hidden'
-                };
-                
-                /* - copy style */
-                /* @see http://stackoverflow.com/questions/1004475/jquery-css-plugin-that-returns-computed-style-of-element-to-pseudo-clone-that-ele */
-                var attr = ['margin-top', 'margin-right', 'margin-bottom', 'margin-left',
-                             'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-                             'border-top-width','border-right-width','border-bottom-width',
-                             'border-left-width','border-top-color','border-right-color',
-                             'border-bottom-color','border-left-color','border-top-style',
-                             'border-right-style','border-bottom-style','border-left-style',
-                             'z-index','float','clear','cursor'];
-        
-                var len = attr.length;
-                for (var i = 0; i < len; i++) 
-                    style[attr[i]] = $img.css(attr[i]);
-
-
                 /* Change Images Style */
                 $img
                     .css({
