@@ -6,7 +6,7 @@
  * and GPL (GPL-LICENSE.txt) licenses.
  *
  * @author 	Anton Shevchuk AntonShevchuk@gmail.com
- * @version 0.0.1
+ * @version 0.0.2
  */
 ;(function($) {
     defaults  = {
@@ -15,10 +15,10 @@
         left:0, // can be 'center'
         top:0,  // can be 'center'
         zoom:true,
-        speed:500, // only in ms
         opacity:0.8, // from 0.0 to 1.0
-        round:60,
-        func:"linear" // linear, zigzag, vertical, horizontal, x  
+        func:"snake", // snake, zigzag, vertical, horizontal, x  
+        speed:500, // only in ms
+        round:"auto"  // auto is equal 1/4 of height
     };
     
     /**
@@ -36,18 +36,26 @@
         // Now initialize the configuration
         this.options = $.extend({}, defaults, settings);
         
+        // Check round value
+        if (this.options.round == 'auto') {
+            this.options.round = Math.round(this.options.round/4);
+        }
+        
         /**
          * Construct
          */
         this.each(function(){
-            // fix for stupid browser
-            if($.browser.msie){
-                $(this).attr('src', $(this).attr('src') + '?random=' + (new Date()).getTime());
-            }
             // need wait for load images
             $(this).load(function(){
                
                 var $img = $(this);
+                
+                if ($img.data('asexy')) {
+                    return true;
+                } else {
+                    $img.data('asexy', true);
+                }
+                
                 var $div = $img.wrap('<div class="asexy"></div>').parent();
        
                 /* Image size */
@@ -141,11 +149,11 @@
                 }, function() {
                    _sexy.back(this); 
                 });
-            });
+            }).trigger('load');
             
             return this;
         });
-        
+                
         /**
          * Run animation
          *
@@ -168,16 +176,16 @@
                 case 'zigzag':
                     _sexy.go.zigzag(el);
                     break;
-                case 'linear':
+                case 'snake':
                 default:
-                    _sexy.go.linear(el);
+                    _sexy.go.snake(el);
                     break;
             }
             
         };
         
         /**
-         * Linear animatation:
+         * Snake animatation:
          *  --> V
          *  V <--
          *  --> V
@@ -185,7 +193,7 @@
          *
          * @param {DOMElement} el DIV with class "asexy"
          */        
-        this.go.linear = function(el) {
+        this.go.snake = function(el) {
             
             var $el  = $(el);            
             var $img = $el.find('img');
@@ -229,7 +237,7 @@
                 
                 if (data.diff.height) {
                     if (height > data.diff.height) {
-                        vspeed  = data.div.height/speed*2*(height - data.diff.height);
+                        vspeed = Math.round(data.div.height/speed*2*(height - data.diff.height));
                         height = data.diff.height;                    
                     } else {
                         vspeed = speed;
