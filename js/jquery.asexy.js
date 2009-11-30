@@ -6,7 +6,7 @@
  * and GPL (GPL-LICENSE.txt) licenses.
  *
  * @author 	Anton Shevchuk AntonShevchuk@gmail.com
- * @version 0.0.2
+ * @version 0.0.3
  */
 ;(function($) {
     defaults  = {
@@ -16,7 +16,7 @@
         top:0,  // can be 'center'
         zoom:true,
         opacity:0.8, // from 0.0 to 1.0
-        func:"snake", // snake, zigzag, vertical, horizontal, x  
+        func:"snake", // snake, zigzag, vertical, horizontal, linear, x  
         speed:500, // only in ms
         round:"auto"  // auto is equal 1/4 of height
     };
@@ -173,6 +173,9 @@
                 case 'horizontal':
                     _sexy.go.horizontal(el);
                     break;
+                case 'linear':
+                    _sexy.go.linear(el);
+                    break;
                 case 'zigzag':
                     _sexy.go.zigzag(el);
                     break;
@@ -182,6 +185,33 @@
                     break;
             }
             
+        };
+        
+        /**
+         * Linear animatation:
+         *  horizontal or vertical animation
+         *  based on ratio image width (or height) to div width (or height)
+         *
+         * @param {DOMElement} el DIV with class "asexy"
+         */        
+        this.go.linear = function(el) {
+            
+            var $el  = $(el);            
+            var $img = $el.find('img');
+            var data = $el.data('asexy');
+            var left = $img.css('left');
+            var top  = $img.css('top');
+            
+            var speed  = _sexy.options.speed;
+            
+            /* start animation */
+            if ((data.img.width/data.div.width) >= (data.img.height/data.div.height)) {
+                /* horizontal */
+                $img.animate({left:-data.diff.width},speed);
+            } else {
+                /* vertical */      
+                $img.animate({top:-data.diff.height},speed);
+            }
         };
         
         /**
@@ -314,8 +344,7 @@
             
             $img
                 .animate({left:-data.diff.width}, speed)
-                .animate({left:0,}, speed)                
-                ;
+                .animate({left:0}, speed);
         };
         
         /**
@@ -335,8 +364,7 @@
             
             $img
                 .animate({top:-data.diff.height}, speed)
-                .animate({top:0,}, speed)                
-                ;
+                .animate({top:0}, speed);
         };
         
         /**
@@ -358,8 +386,7 @@
                 .animate({left:-data.diff.width, top:-data.diff.height}, speed)
                 .animate({left:-data.diff.width, top:0                }, speed)                
                 .animate({left:0,                top:-data.diff.height}, speed)
-                .animate({left:0,                top:0                }, speed)
-                ;
+                .animate({left:0,                top:0                }, speed);
               
         };
         
