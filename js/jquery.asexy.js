@@ -6,7 +6,7 @@
  * and GPL (GPL-LICENSE.txt) licenses.
  *
  * @author 	Anton Shevchuk AntonShevchuk@gmail.com
- * @version 0.0.3
+ * @version 0.0.4
  */
 ;(function($) {
     defaults  = {
@@ -45,16 +45,20 @@
          * Construct
          */
         this.each(function(){
-            // need wait for load images
-            $(this).load(function(){
-               
-                var $img = $(this);
+            var $img = $(this);
+            
+            // need wait for load image
+            $img.load(function(){
                 
                 if ($img.data('asexy')) {
                     return true;
                 } else {
                     $img.data('asexy', true);
                 }
+                
+                $img.removeAttr("width")
+                    .removeAttr("height")
+                    .css({ width: "", height: "" });
                 
                 var $div = $img.wrap('<div class="asexy"></div>').parent();
        
@@ -64,17 +68,16 @@
                 
                 /* Zoom */
                 if (_sexy.options.zoom) {
-                    var kWidth  = _sexy.options.width /$img.width();
-                    var kHeight = _sexy.options.height/$img.height();
+                    var kWidth  = _sexy.options.width /imgWidth;
+                    var kHeight = _sexy.options.height/imgHeight;
                     
                     var kImg    = (kWidth>kHeight)?kWidth:kHeight;
                     imgWidth  = kImg*imgWidth;
                     imgHeight = kImg*imgHeight;
                     
-                    $img.width(imgWidth);
-                    $img.height(imgHeight);
+                    $img.attr('width',  imgWidth);
+                    $img.attr('height', imgHeight);
                 }
-                
                 /* Build style for DIV */
                 /* - reset */ 
                 var style = {
@@ -149,7 +152,12 @@
                 }, function() {
                    _sexy.back(this); 
                 });
-            }).trigger('load');
+            });//.trigger('load');
+            
+            
+            var src  = $img.attr('src');
+                       $img.attr('src', '');
+                       $img.attr('src', src);
             
             return this;
         });
